@@ -1,0 +1,415 @@
+﻿Logic Sample Loader Manual
+
+Version 1.2.0. By Takahashi. This software and this manual were made with AI (Anthropic's Claude) (chapter 16).
+The app's file name is Japanese (Logicサンプルローダー.app). When your Mac is set to English, Finder and the app show it as Logic Sample Loader.
+Contents. There are 18 chapters.
+1. What this app does
+2. Requirements
+3. Installing
+4. Layout of the window
+5. Loading into Quick Sampler (basic use)
+6. Loading into Drum Machine Designer pads
+7. Pasting on an audio track (matched to tempo and key)
+8. Changing pitch without changing speed (Flex)
+9. Load settings
+10. Keyboard commands
+11. Keys used inside Logic (Keyboard Maestro helper)
+12. Files the app creates
+13. Troubleshooting
+14. Uninstalling
+15. Limitations
+16. Made with AI
+17. License
+18. Version history
+
+== 1. What this app does
+
+In Logic Pro, you listen to samples (from Splice or elsewhere), choose one, and put it into one of three places:
+- Load it into Quick Sampler (a sampler you play from the keyboard)
+- Load samples one by one into the pads of Drum Machine Designer (DMD) to build a drum kit
+- Paste a loop on an audio track, matched to the project tempo and key
+
+It is designed to be used with VoiceOver and the keyboard only. Some controls in Logic cannot be reached with VoiceOver navigation (such as the Sample name field and the Flex button in Quick Sampler); the app presses them for you.
+The app copies each sample into a work folder before loading it. Logic writes extra information into the files it loads, so the original Splice files are never handed to Logic directly.
+
+== 2. Requirements
+
+The table has 8 rows and 3 columns: “Item”, “Needed” and “Notes”.
+- Item: A Mac with Apple silicon (M1 or later) / Needed: Yes / Notes: Intel Macs are not supported
+- Item: macOS 15 or later / Needed: Yes / Notes: Tested by the author on macOS 15.7.8
+- Item: Logic Pro 12.3 (in English or Japanese) / Needed: Yes / Notes: Logic can be displayed in English or Japanese (see below)
+- Item: VoiceOver / Needed: Yes / Notes: Results are spoken by VoiceOver
+- Item: Splice samples / Needed: Helpful / Notes: You can search the samples in your Splice folder. Without them, you can still choose files and load them
+- Item: ffmpeg / Needed: For pasting on audio tracks / Notes: Makes the sound matched to tempo and key. Install it with Homebrew
+- Item: rubberband / Needed: Better sound quality / Notes: Improves the quality of stretching and transposing. Install it with Homebrew
+- Item: Keyboard Maestro / Needed: For the keys used inside Logic / Notes: Control-Shift-L, T and P (chapter 11). Loading and Flex still work from the app without it
+
+-- Logic Pro's display language
+
+The app finds Logic's controls by their names (Tempo, Key Signature, File, Import and so on). It knows both the English and the Japanese names, so it works whether Logic is displayed in English or in Japanese (from version 1.2.0; before that, only English).
+If Logic is displayed in another language (German, French and so on), the controls are not found and the app does not work. Then set only Logic to English: in System Settings, General, Language & Region, under Applications, press the add button, choose Logic Pro and set its language to English. Logic is in English the next time it opens.
+
+-- The app's display language (English or Japanese)
+
+The app's window, menus and spoken messages follow your Mac's language settings and appear in English or Japanese. In System Settings, General, Language & Region, under Preferred Languages: if Japanese is above English, the app is in Japanese; otherwise it is in English (any other language also gives English). The Keyboard Maestro helper (chapter 11) speaks in the same language.
+To change the language of this app only, use Applications in the same place: press the add button, choose the app and pick a language. Then quit and open the app again (the language is chosen when the app opens).
+
+-- Logic's plug-in window size
+
+The Quick Sampler and Drum Machine Designer windows were tested at 100% plug-in window size in Logic. Other sizes are taken into account, but they have not been tested.
+
+-- If you use Logic Magician
+
+This manual uses the Hyphen key of Logic Magician to open plug-in windows. If you do not use Logic Magician, open the plug-in with the open button on the instrument slot of the channel strip in the inspector.
+
+== 3. Installing
+
+-- 3.1 Put the app in place
+
+1. Open the zip file in Finder (select it and press Command-O). A folder named “Logicサンプルローダー_1.2.0” appears next to it
+2. Move “Logicサンプルローダー.app” from that folder to the Applications folder: select the app in Finder and press Command-C, then press Option-Command-V (move) in the Applications folder. In English, Finder shows the app as Logic Sample Loader
+3. The manual and other documents can be kept anywhere
+
+-- 3.2 Opening the app for the first time
+
+This app is not notarized by Apple. When you first open an app that came from a zip file downloaded from the internet, macOS may stop it from opening. If that happens, use one of these two methods.
+
+- Method 1: Open it from System Settings
+
+1. Try to open the app once. When the message says it cannot be opened, close it with Done
+2. Open Privacy & Security in System Settings and go down to the Security section. There is a note that the app was blocked, and an Open Anyway button
+3. Press Open Anyway and confirm with your password (or Touch ID)
+4. Open the app again. When asked to confirm, choose Open Anyway
+
+The wording and button names can differ a little between macOS versions. From the second time on, the app opens normally.
+
+- Method 2: Remove the quarantine flag in Terminal
+
+After moving the app to the Applications folder, run this line in Terminal. The path uses the app's real (Japanese) file name, so copy the whole line.
+xattr -dr com.apple.quarantine "/Applications/Logicサンプルローダー.app"
+This removes the “quarantine” flag that macOS puts on files downloaded from the internet. After that, the app opens normally.
+
+-- 3.3 Accessibility permission
+
+The app presses controls in Logic, so it needs Accessibility permission. The first time you try to load a sample, macOS shows a message asking for it.
+1. Press Open System Settings in the message. Open Accessibility Settings in the app's Actions menu opens the same place
+2. In System Settings, Privacy & Security, Accessibility, turn on the switch for the app (you are asked for your password)
+3. Quit the app and open it again. The permission takes effect when the app opens again
+
+Until the permission is on, the Check Destination button in the main window has “No accessibility permission yet” in its name.
+
+- After replacing the app with a new version
+
+When you replace the app with a new version, macOS may treat it as a different app and the old permission stops working. If you hear “Accessibility permission is missing”, remove the app from the list with the remove button, then turn the permission on again.
+You may also be asked for permission to control “System Events”. It is used only as a fallback for speech, and the app works without it.
+
+-- 3.4 The Splice folder and the index
+
+The app searches a list of your Splice samples (the index). The first time, press Command-R to build the index. After you download more samples, press Command-R again to rebuild it.
+The Splice folder is usually “Splice” in your home folder; the app looks for “sounds”, then “packs” inside it. If you moved your Splice folder, use Choose Splice Folder in the Actions menu. You can choose the Splice folder itself; the app finds the pack folder inside. Choosing a folder rebuilds the index.
+Without Splice, you can still choose any file with Command-O and load it.
+
+-- 3.5 ffmpeg and rubberband (for pasting on audio tracks)
+
+Pasting on an audio track uses ffmpeg to make a sound matched to the tempo and key. If rubberband is also installed, it is used for stretching and transposing, and the sound quality is better. Install both with Homebrew by running this line in Terminal:
+brew install ffmpeg rubberband
+Loading into Quick Sampler and into DMD pads needs neither.
+
+-- 3.6 Keyboard Maestro helper (optional)
+
+This helper lets you press the hard-to-reach Quick Sampler controls with Control-Shift-L, T and P while you work in Logic (chapter 11). It needs Keyboard Maestro.
+1. Choose Install Keyboard Maestro Helper in the app's Actions menu. Keyboard Maestro opens and imports 3 macros
+2. The imported macros arrive disabled. In the Keyboard Maestro editor, enable the macros in the group “Logic Sample Loader Helper” (with the app in Japanese, the group has a Japanese name)
+3. In VoiceOver Utility, General, allow VoiceOver to be controlled with AppleScript (needed to speak results; if you use Logic Magician, it is already on)
+
+Choosing it again does not import macros that are already installed, so nothing is duplicated. If you move the app, open it once and the macros will use the app in its new place.
+
+== 4. Layout of the window
+
+The window has three headings, from top to bottom: Find Samples, Search Results and Load. When the app opens, the focus is in the search field.
+The fields Tab stops at, in order. Shift-Tab goes back in reverse order. The table has 14 rows and 3 columns: “Order”, “Field” and “Available”.
+- Order: 1 / Field: Search / Available: Always
+- Order: 2 / Field: Key / Available: Always
+- Order: 3 / Field: Include relative key / Available: Always
+- Order: 4 / Field: BPM. Leave empty for any / Available: Always
+- Order: 5 / Field: Type / Available: Always
+- Order: 6 / Field: Pack / Available: Always
+- Order: 7 / Field: Search / Available: Always
+- Order: 8 / Field: Search Results / Available: Always
+- Order: 9 / Field: Destination / Available: Always
+- Order: 10 / Field: Pad / Available: Only when the destination is a DMD pad
+- Order: 11 / Field: Paste track / Available: Only when the destination is an audio track
+- Order: 12 / Field: Tempo mode / Available: Only when the destination is an audio track
+- Order: 13 / Field: Match key / Available: Only when the destination is an audio track
+- Order: 14 / Field: Transpose / Available: Only when the destination is an audio track
+
+Under the Load heading there are also buttons (load, Load Settings, Check Destination, Toggle Flex, Choose File and Load). Tab does not stop on them, but each one has a key that does the same (chapter 10). If VoiceOver navigation lands on one, you can press it with Return or Space.
+If you lose your place, Command-F takes you to the search field and Command-I to the search results. The bottom line of the window shows the last spoken message.
+After the focus stops on a field, VoiceOver reads a usage hint. If that is too long, you can turn hints off in VoiceOver Utility, Verbosity, Hints (this is a VoiceOver setting, so it affects other apps too).
+
+== 5. Loading into Quick Sampler (basic use)
+
+1. In Logic, select the track to load into (a software instrument track with Quick Sampler) and open the Quick Sampler window (the Hyphen key with Logic Magician)
+2. Set the app's destination to Quick Sampler (Command-1). It is Quick Sampler at first
+3. Enter a search word, key, BPM, type and pack, then press Return in the search field (or use Search). BPM is matched within 4 either way. The Pack field reads the pack name followed by the number of samples in it
+4. In the search results, use Up and Down Arrow. Each line reads the name, BPM, key, type and length. Press Space to preview (press again to stop)
+5. When you have chosen, press Return. Logic comes to the front and loads the sample, then the app comes back and speaks the result (it takes about 5 seconds)
+6. Play your MIDI keyboard to check it. Logic plays even when it is in the background. Choose the next sample and press Return, and so on
+
+-- While loading
+
+Logic's menus and the Open dialog open and close, and VoiceOver may read them. Do not touch the keyboard or mouse until it finishes. If something fails, the app closes the Open dialog, puts things back and speaks the reason.
+Each time it loads, the app sets Flex (changing pitch without changing speed) according to your settings. The default is “on for loops, off for one-shots and effects” (chapter 8).
+
+== 6. Loading into Drum Machine Designer pads
+
+Build a drum kit by loading one-shots you chose by ear into DMD pads, one at a time. DMD has 48 pads (3 pages of 16), and each pad holds a Quick Sampler.
+1. In Logic, select the DMD track and open the DMD window. Also show the inspector (the I key in Logic), because the app uses the pad's channel
+2. Set the app's destination to DMD pad (Command-2). The app reads the pads from Logic and lists all 48 in the Pad field (read like “Pad 3, D1 SNARE 1. Empty”)
+3. Choose the pad to load into. Command-Right Bracket (]) moves to the next pad and Command-Left Bracket ([) to the previous one, and the app reads what is in it. After pad 48 comes pad 1
+4. Choose a sample in the list and press Return. Each pad takes about 6 seconds. After loading, the next pad is selected (you can turn this off with Command-S)
+
+- An empty pad gets a Quick Sampler first, then the sample. After loading, the pad is named after the sample (otherwise it stays “Empty Pad” or similar, and you cannot tell pads apart by ear)
+- While loading, the DMD window closes and opens again (the app does not load from the Quick Sampler window shown inside DMD, because Logic once crashed when loading from there)
+- Pads with an instrument other than Quick Sampler are not loaded into. The app says why
+- If you change pads in Logic, press Command-T to read the pad list again
+
+== 7. Pasting on an audio track (matched to tempo and key)
+
+A loop is turned into a sound that matches the project tempo and key, then pasted on a Logic audio track. This needs ffmpeg (3.5).
+
+-- 7.1 Steps
+
+1. In Logic, put the playhead in the bar where you want to paste. Also show the inspector (the I key)
+2. Set the app's destination to audio track (Command-3). The app says something like “Destination: audio track. Paste target: Audio 1. 120 BPM, C major”. To also hear the track number, time signature, playhead and whether the bar is empty, press Command-T
+3. Choose the track to paste on. Command-Right Bracket (]) selects the next audio track and Command-Left Bracket ([) the previous one. Software instrument tracks are skipped, and at either end it wraps around. After moving, the app reads the track name first, then whether the bar to paste in is empty (or what is there). You can also choose in the Paste track field, or select the track in Logic
+4. Choose a sample in the list. Space previews the original sound, Shift-Space the sound matched to tempo and key. The matched preview starts with how it was matched, like “Matched sound, Even, 120 BPM.” A short sound plays while the matched sound is being made
+5. When you have chosen, press Return. After about 1.5 seconds it is pasted, and the app says what went where and what it was matched to
+
+What gets pasted is exactly what you heard with Shift-Space. Pressing Space and Shift-Space in turn switches between them without stopping.
+
+-- 7.2 Tempo mode (Half, Even, Double)
+
+Choose in the Tempo mode field. Command-Shift-T also cycles through Half, Even and Double. The basis is the project BPM (not the sample's BPM). The table has 3 rows and 3 columns: “Mode”, “Sample is matched to” and “In a 120 BPM project”.
+- Mode: Half / Sample is matched to: Half the project BPM / In a 120 BPM project: 60 BPM
+- Mode: Even (default) / Sample is matched to: The project BPM / In a 120 BPM project: 120 BPM
+- Mode: Double / Sample is matched to: Twice the project BPM / In a 120 BPM project: 240 BPM
+
+For example, a 2-bar loop at 102 BPM becomes 8 seconds with Half (4 bars of the project), 4 seconds with Even (2 bars) and 2 seconds with Double (1 bar). The sample BPM is taken from the file name. An 87 BPM sample in a 174 BPM project is squeezed to double speed with Even; to keep it as it is, choose Half. When Even stretches a lot, the app adds “Half would stretch it less”.
+
+-- 7.3 Key and transpose
+
+- The Match key field defaults to the project key (Key Signature in Logic's control bar). You can also choose not to match (keep the sample's key) or one of the 24 keys. Command-K switches between matching the project key and not matching
+- Relative keys are not transposed (an A minor sample in a C major project stays as it is). When it shifts, it takes the nearer direction (from 6 semitones down to 5 semitones up)
+- The Transpose field moves it further up or down in semitones after matching the key (up to 12 semitones)
+- Tempo mode, key and transpose are not saved. When the app closes, they go back to Even, the project key and no transpose (so the values from one song are not used for the next by mistake)
+
+-- 7.4 Playhead after pasting
+
+Choose one of three in “Playhead after pasting on the audio track” in Command-S:
+- Move to the end of the pasted audio (default). Press Return again to line loops up one after another. If the end is in the middle of a bar, the playhead moves to the start of the next bar
+- Move to the start of the pasted audio, so you can play it right away
+- Don't move
+
+-- 7.5 Things to know
+
+- Logic pastes at the start of the bar the playhead is in (even in the middle of a beat, it goes to the start of the bar). If you set “Where to paste on the audio track” to “Nearest bar start”, stopping near the end of a bar pastes at the next bar
+- The playhead is not moved while playing. To line loops up, stop first, then press Return
+- Software instrument tracks cannot be pasted on. Create a new audio track in Logic with Option-Command-A
+- When two or more tracks are selected, the sample goes on the track shown in Logic's inspector
+- Pasting a stereo sample on an empty mono track makes Logic switch the track to stereo (the app says so)
+- If you change Logic's tempo after pasting, pasted loops do not follow. Paste them again after changing the tempo
+- One-shots and effects are not tempo-matched (if their key is known, only the key is matched). If a sample's BPM or key is unknown, that part is not matched, and the app says so
+- MP3, CAF, FLAC and M4A samples can be matched too (they are converted to WAV first)
+- If Logic lags and the inspector does not switch, the app stops there and says so. Press Command-T to check again
+- If a sample contains tempo information or markers, Logic asks “Do you want to import it into this project?”. The app pastes samples matched to the project, so it answers Don’t Import (and says so; the project tempo and markers stay unchanged)
+- While the Drum Machine Designer window is open, Logic sometimes does not accept pasting on an audio track. Then the app closes the DMD window before pasting (and says so)
+
+== 8. Changing pitch without changing speed (Flex)
+
+By default, Quick Sampler changes speed along with pitch when you play different keys (higher keys play faster and shorter). Turning on Flex, at the lower right of the waveform display, keeps the speed when the pitch changes. VoiceOver navigation cannot reach this button, and it has no name.
+- Each time it loads, the app sets Flex according to your settings. The default is “Match the sample”: on for loops, off for one-shots and effects (Flex carries over to the next sample, so the app sets it every time)
+- To toggle it after loading, press Command-Shift-F in the app, or Control-Shift-T inside Logic (Keyboard Maestro helper)
+- Turning on Follow Tempo (next to Flex) makes the sample play at the project tempo. It is off by default (if Logic does not know the sample's tempo correctly, it plays at the wrong speed). Press Command-Shift-P in the app, or Control-Shift-P inside Logic. It works only when Flex is on
+
+Flex is not used when pasting on an audio track (the app makes the matched sound before pasting).
+
+== 9. Load settings
+
+Command-S opens the Load Settings window. Change things and press OK; the app speaks the result. Escape or Command-W closes it without changes. Settings are kept for next time.
+The items in Load Settings (Command-S), from top to bottom. The table has 9 rows and 3 columns: “Item”, “Choices” and “Default”.
+- Item: Load mode / Choices: Original. Pitch, level and length stay as they are / Optimized. Tunes and normalizes, finds loop points, trims silence at both ends / Default: Original. Pitch, level and length stay as they are
+- Item: Keep speed (Flex). When on, changing the pitch does not change the speed / Choices: Match the sample. On for loops / Always on / Off / Default: Match the sample. On for loops
+- Item: Follow Tempo. Works only when Flex is on / Choices: Off. Plays at the sample's own speed / On. Follows the project tempo / Default: Off. Plays at the sample's own speed
+- Item: After loading / Choices: Return to this app / Stay in Logic / Default: Return to this app
+- Item: Where to paste on the audio track / Choices: Start of the bar the playhead is in (Logic's rule) / Nearest bar start (moves the playhead first, then pastes) / Default: Start of the bar the playhead is in (Logic's rule)
+- Item: Playhead after pasting on the audio track / Choices: Move to the end of the pasted audio (paste again to line loops up) / Move to the start of the pasted audio (play to hear it right away) / Don't move / Default: Move to the end of the pasted audio (paste again to line loops up)
+- Item: Preview automatically when the selection changes / Choices: On / Off / Default: Off
+- Item: Move to the next pad after loading into a DMD pad / Choices: On / Off / Default: On
+- Item: Match the project tempo when pasting on an audio track / Choices: On / Off / Default: On
+
+The Optimized load mode makes Quick Sampler tune and normalize the sample, find loop points and trim silence at both ends. Original keeps it as it is.
+
+== 10. Keyboard commands
+
+Symbol keys are written with their names. Inside the app, Command-Shift-K reads the list of keyboard commands.
+
+-- 10.1 Keys in fields and in the list
+
+The table has 7 rows and 3 columns: “Where”, “Key” and “Action”.
+- Where: Search and BPM fields / Key: Return / Action: Search
+- Where: Search results / Key: Up and Down Arrow / Action: Move between items (reads name, BPM, key, type and length)
+- Where: Search results / Key: Letter keys / Action: Jump to items starting with that letter
+- Where: Search results / Key: Space / Action: Play and stop the preview (the original sound, for every destination)
+- Where: Search results / Key: Shift-Space / Action: Play and stop the sound matched to the project tempo and key (the same sound that is pasted on an audio track)
+- Where: Search results / Key: Return / Action: Load into the destination (Quick Sampler, a DMD pad or an audio track)
+- Where: Buttons / Key: Return, Space / Action: Press
+
+-- 10.2 Menu keys
+
+Keys assigned to menu items. They work from any field. The table has 20 rows and 2 columns: “Key” and “Action”.
+- Key: Command-S / Action: Load Settings
+- Key: Command-Shift-T / Action: Cycle Tempo Mode
+- Key: Command-K / Action: Toggle Matching the Project Key
+- Key: Command-T / Action: Check Destination Again
+- Key: Command-1 / Action: Destination: Quick Sampler
+- Key: Command-2 / Action: Destination: DMD Pad
+- Key: Command-3 / Action: Destination: Audio Track
+- Key: Command-Shift-L / Action: Cycle Destination
+- Key: Command-Shift-F / Action: Toggle Flex
+- Key: Command-Shift-P / Action: Toggle Follow Tempo
+- Key: Command-O / Action: Choose File and Load
+- Key: Command-Right Bracket (]) / Action: Next pad (when the destination is a DMD pad). Next audio track as the paste track (when it is an audio track)
+- Key: Command-Left Bracket ([) / Action: Previous pad (when the destination is a DMD pad). Previous audio track as the paste track (when it is an audio track)
+- Key: Command-C / Action: Copy Path
+- Key: Command-R / Action: Update Splice Index
+- Key: Command-Shift-G / Action: Cycle Pack Order
+- Key: Command-I / Action: Go to Search Results
+- Key: Command-F / Action: Go to Search Field
+- Key: Command-Q / Action: Quit
+- Key: Command-Shift-K / Action: Keyboard Commands
+
+When the destination is an audio track, the menu items Next Pad and Previous Pad become Next Track and Previous Track. When you press the key, VoiceOver first reads the item name, so the app waits a moment before speaking the result.
+
+-- 10.3 Menu-only items
+
+Menu items without keys. Press VO-M to move to the menu bar and choose them. The table has 7 rows and 3 columns: “Menu”, “Item” and “Description”.
+- Menu: Actions / Item: Load into Destination / Description: Load the selected sample (Return in the list)
+- Menu: Actions / Item: Preview Original Sound Play/Stop / Description: Hear the selected sample as it is (Space in the list)
+- Menu: Actions / Item: Preview Matched Sound Play/Stop / Description: Hear it matched to the project tempo and key (Shift-Space in the list)
+- Menu: Actions / Item: Choose Splice Folder… / Description: Choose the folder that holds your Splice samples
+- Menu: Actions / Item: Open Accessibility Settings / Description: Please turn the permission on yourself
+- Menu: Actions / Item: Install Keyboard Maestro Helper… / Description: Send the macros for the keys used inside Logic (Control-Shift-L, T, P) to Keyboard Maestro
+- Menu: Help / Item: Version Information / Description: Build date and commit
+
+== 11. Keys used inside Logic (Keyboard Maestro helper)
+
+VoiceOver navigation cannot reach Quick Sampler's Sample name field or the Flex button. The Keyboard Maestro helper (installed in 3.6) presses them for you with these three keys. They work only inside Logic Pro. For each, open the Quick Sampler window first. The table has 3 rows and 2 columns: “Key” and “Action”.
+- Key: Control-Shift-L / Action: Press the Sample name field and open the sample load menu
+- Key: Control-Shift-T / Action: Toggle Flex (when on, changing the pitch does not change the speed)
+- Key: Control-Shift-P / Action: Toggle Follow Tempo (only when Flex is on)
+
+-- Using Control-Shift-L
+
+1. Press Control-Shift-L. A menu opens (VoiceOver reads it)
+2. Press Down Arrow to Load Audio File… and press Return
+3. Choose the sample in the standard Open dialog. Choose Original or Optimized at the bottom, then Open
+
+- T and P speak the result of the switch. If something could not be pressed, the reason is spoken
+- If Quick Sampler is in Controls view, the helper switches to Editor view first and says so
+- On this route, Logic writes information directly into the sample file. To keep your Splice originals untouched, load from the app instead
+- If you use Logic Magician, its single-letter keys may grab what you type in the Open dialog. Turn Logic Magician off for a moment (Control-Escape), type, then turn it back on
+
+== 12. Files the app creates
+
+The table has 7 rows and 3 columns: “What”, “Where” and “Can it be deleted”. In the paths, “~” is your home folder.
+- What: Settings / Where: ~/Library/Application Support/LogicSampleLoader/settings.json / Can it be deleted: Deleting resets them to the defaults
+- What: Splice index / Where: ~/Library/Application Support/LogicSampleLoader/splice_index.json / Can it be deleted: Yes; rebuild it with Command-R
+- What: Keyboard Maestro helper script and definitions / Where: km_helper.sh and Logicサンプルローダー補助.kmmacros in ~/Library/Application Support/LogicSampleLoader/ / Can it be deleted: Keep the script if you use the helper
+- What: Copies of samples / Where: ~/Music/LogicSampleLoader/pack name/folder in the pack/original file name / Can it be deleted: No (projects you loaded into use them)
+- What: Sounds matched to tempo and key / Where: The same folder as the copies, with names like “original name__120bpm_even_+3_Am.wav” (sounds made with rubberband go in a rubberband folder inside it) / Can it be deleted: No (projects you pasted into use them)
+- What: Sounds made for previews / Where: ~/Library/Caches/LogicSampleLoader/preview/ / Can it be deleted: Deleted when the app closes
+- What: Log / Where: ~/Library/Logs/LogicSampleLoader.log / Can it be deleted: Yes
+
+Logic uses the matched file name as the region name, so hearing the name tells you how it was matched (“120bpm_even” is matched to the project's 120 BPM with Even, “+3_Am” is 3 semitones up, in A minor; Half gives “120bpm_half” and Double “120bpm_double”). The same conditions give the same name, and the file is reused instead of made again.
+
+== 13. Troubleshooting
+
+-- Nothing is spoken
+
+Check that VoiceOver is on. The app writes every spoken message with the time into its log (~/Library/Logs/LogicSampleLoader.log; the app writes its own log lines in Japanese, and spoken messages appear after “[読み上げ]”). If a message is in the log but you did not hear it, VoiceOver may have been reading something else. The bottom line of the window also shows the last message.
+
+-- “Accessibility permission is missing”
+
+Turn the permission on as in 3.3, then open the app again. If you just replaced the app with a new version, remove it from the list first, then turn the permission on again.
+
+-- “The Quick Sampler window is not open”
+
+In Logic, open the Quick Sampler window of the track to load into, then press Return again.
+
+-- “The Drum Machine Designer window is not open” or “The inspector is not shown”
+
+In Logic, open the DMD window and show the inspector (the I key), then press again.
+
+-- “Cannot read the Splice index”, or searches find nothing
+
+Press Command-R to build the index. If you hear “The Splice folder was not found”, use Choose Splice Folder in the Actions menu to pick the folder with your samples.
+
+-- “ffmpeg was not found”
+
+Install ffmpeg with Homebrew as in 3.5, then open the app again.
+
+-- “Not an audio track” or “No track is selected”
+
+Select an audio track in Logic, then press Return again. You can also select one with Command-Right Bracket (]) in the app.
+
+-- “Logic does not respond” or “Logic's inspector still shows …”
+
+Logic has not caught up with the track selection or the inspector. Wait a moment, then press Command-T to check again, or press the key again.
+
+-- A pasted loop does not match the metronome
+
+The app reads the sample BPM from the file name. If the name counts the BPM at double or half, choose Half or Double and paste again. When the loop length does not fit its BPM, the app adds “the tempo may drift”.
+
+-- The Keyboard Maestro keys do not work
+
+In the Keyboard Maestro editor, check that the macros in the helper group are enabled. If results are not spoken, allow AppleScript control in VoiceOver Utility. If you moved the app, open it once (do the same if you hear “Logic Sample Loader was not found”).
+
+-- If you are still stuck
+
+The log (~/Library/Logs/LogicSampleLoader.log) records what the app did (lines with “[補助]”, written in Japanese) and what it said. It helps to find where things stopped.
+
+== 14. Uninstalling
+
+1. Quit the app (Command-Q) and move “Logicサンプルローダー.app” (shown as Logic Sample Loader) from the Applications folder to the Trash
+2. To remove the settings and the index, move ~/Library/Application Support/LogicSampleLoader to the Trash. Preview sounds are in ~/Library/Caches/LogicSampleLoader, and the log is ~/Library/Logs/LogicSampleLoader.log
+3. Delete ~/Music/LogicSampleLoader (sample copies and matched sounds) only when no Logic project uses them
+4. If you installed the Keyboard Maestro helper, delete its group in the Keyboard Maestro editor
+5. Remove the app from the list in System Settings, Privacy & Security, Accessibility
+
+== 15. Limitations
+
+- Logic Pro must be displayed in English or Japanese (chapter 2). If a new Logic version changes its windows, controls may no longer be found
+- Intel Macs are not supported
+- Do not touch the keyboard or mouse while loading. The app brings Logic to the front and operates it
+- Only DMD pads with Quick Sampler can be loaded into
+- Pasted loops do not follow later tempo changes in Logic
+- Sample BPM and key are read from the file name. Samples without them in the name cannot be matched to tempo and key
+- Sample copies and matched sounds (~/Music/LogicSampleLoader) are used by the projects you loaded them into. Deleting them silences those sounds in the projects
+
+== 16. Made with AI
+
+This software was made with AI (Anthropic's Claude) under the direction and decisions of the author (Takahashi). Most of the program code and of the text in this manual and other documents was written by the AI. Testing with Logic Pro and VoiceOver was done on the author's Mac.
+Depending on the laws of your country or region, parts made by AI may not be protected by copyright. The license is granted to the extent of the rights the author may hold (chapter 17).
+
+== 17. License
+
+This software is distributed under the MIT License. The copyright notice is “Copyright (c) 2026 Takahashi”. You may use, copy, modify, distribute and sell it free of charge. When you distribute it, include the copyright notice and the permission notice. There is no warranty. The author is not responsible for anything that happens from using it. The full text is in “ライセンス.txt” (License) in the distribution; the English text there is the binding one.
+The app contains parts made by others, such as Python, wxPython and PyObjC. Their terms are in “同梱部品のライセンス.txt” (third-party licenses).
+Logic Pro, Quick Sampler, Drum Machine Designer and VoiceOver are products of Apple Inc., Splice is a product of Splice, and Keyboard Maestro is a product of Stairways Software. This app is not affiliated with those companies.
+
+== 18. Version history
+
+- 1.2.0 (2026-11-02): The app now also works when Logic is displayed in Japanese. Fixed a problem where, after pasting on an audio track, Logic kept asking whether to import the sample’s tempo information or markers and the next paste did not work (the app answers Don’t Import). Fixed a problem where Command-Right Bracket and Command-Left Bracket could not move to an audio track while the output track (Stereo Out) was selected. Fixed a problem where pasting on an audio track sometimes failed while a Quick Sampler or Drum Machine Designer window was in front. Fixed a problem where loading into an empty DMD pad sometimes stopped with “The inspector is not shown”
+- 1.1.0 (2026-10-27): The window and spoken messages can now be in English (following the Mac's language settings), with an English manual. Fixed a problem where Command-Right Bracket and Command-Left Bracket sometimes could not move between audio tracks and said “Logic does not respond”
+- 1.0.0 (2026-10-24): First release
