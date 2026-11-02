@@ -1,0 +1,9 @@
+# ソースから動かすときに要るもの（python3.14 -m pip install -r requirements.txt）。版は確かめたもの
+wxPython==4.2.5
+just_playback==0.1.8
+pyobjc-core==12.2
+pyobjc-framework-Cocoa==12.2
+pyobjc-framework-ApplicationServices==12.2
+pyobjc-framework-Quartz==12.2
+# 配布版（zip）を作るときだけ
+pyinstaller==6.20.0

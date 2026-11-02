@@ -1,0 +1,9 @@
+/* Logic Sample Loader: English names and permission texts (shown when the Mac language is English). */
+"CFBundleName" = "Logic Sample Loader";
+"CFBundleDisplayName" = "Logic Sample Loader";
+"NSAccessibilityUsageDescription" = "Used to press controls in Logic Pro (Quick Sampler, Drum Machine Designer and audio tracks) that VoiceOver cannot reach, so samples can be loaded.";
+"NSAppleEventsUsageDescription" = "Used only as a fallback: asks VoiceOver through System Events to speak when the app cannot request speech itself.";
+"NSDesktopFolderUsageDescription" = "Used to load samples placed on the Desktop.";
+"NSDocumentsFolderUsageDescription" = "Used to load samples in the Documents folder (the app's program files may also be there).";
+"NSDownloadsFolderUsageDescription" = "Used to load downloaded samples.";
+"NSRemovableVolumesUsageDescription" = "Used to load samples on external drives (such as the Splice folder).";

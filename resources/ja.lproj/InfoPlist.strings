@@ -1,0 +1,3 @@
+/* Logicサンプルローダー: 日本語の名前（Mac の言語が日本語のとき）。許可の説明は Info.plist の日本語のまま使う。 */
+"CFBundleName" = "Logicサンプルローダー";
+"CFBundleDisplayName" = "Logicサンプルローダー";

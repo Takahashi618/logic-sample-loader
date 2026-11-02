@@ -1,0 +1,61 @@
+"""借りた部品の包み（ui/borrowed.py）の確認。**本物の部品は差し替える**（読み上げ名の付き方だけを見る）。"""
+
+from __future__ import annotations
+
+import os
+import sys
+import unittest
+from pathlib import Path
+from types import SimpleNamespace
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+os.environ.setdefault("LOGICLOADER_SILENT", "1")
+
+from ui import borrowed  # noqa: E402
+
+
+class _Ctrl:
+    def __init__(self):
+        self.names = []
+
+    def SetName(self, name):
+        self.names.append(name)
+
+
+class LabelControlTest(unittest.TestCase):
+    """名前が付いたら、ツールチップと空欄表示は入れない（VoiceOver が同じ文を二度読む。2026-10-13 に実測）。
+    2026-10-24 のレビューで「入れてから消す」をやめ、名前が付かなかったときだけ保険を入れるようにした。"""
+
+    def setUp(self):
+        self.saved = borrowed._ax_label
+        self.calls = []
+
+    def tearDown(self):
+        borrowed._ax_label = self.saved
+
+    def _fake(self, labelled: bool):
+        borrowed._ax_label = SimpleNamespace(
+            set_ax_label=lambda ctrl, label: self.calls.append(("ax", label)) or labelled,
+            label_control=lambda ctrl, label: self.calls.append(("insurance", label)))
+
+    def test_named_control_gets_no_insurance(self):
+        self._fake(True)
+        ctrl = _Ctrl()
+        borrowed.label_control(ctrl, "検索語")
+        self.assertEqual(ctrl.names, ["検索語"])
+        self.assertEqual(self.calls, [("ax", "検索語")])            # 名前は 1 回だけ。保険（ツールチップ）は入れない
+
+    def test_insurance_only_when_the_name_did_not_stick(self):
+        self._fake(False)
+        borrowed.label_control(_Ctrl(), "検索語")
+        self.assertEqual(self.calls, [("ax", "検索語"), ("insurance", "検索語")])
+
+    def test_without_the_borrowed_part_only_the_wx_name(self):
+        borrowed._ax_label = None
+        ctrl = _Ctrl()
+        borrowed.label_control(ctrl, "検索語")
+        self.assertEqual(ctrl.names, ["検索語"])
+
+
+if __name__ == "__main__":
+    unittest.main()
