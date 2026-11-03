@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Logicサンプルローダー マニュアル（1.2.0）</title>
+<title>Logicサンプルローダー マニュアル（1.2.1）</title>
 <style>
 body { font-family: -apple-system, "Hiragino Sans", sans-serif; line-height: 1.7; max-width: 46em; margin: 1.5em auto; padding: 0 1em; color: #111; background: #fff; }
 h1 { font-size: 1.6em; }
@@ -24,7 +24,7 @@ code { font-family: Menlo, monospace; background: #f3f3f3; padding: 0 0.2em; }
 </head>
 <body>
 <h1>Logicサンプルローダー マニュアル</h1>
-<p>版 <span class="version">1.2.0</span>。作者は Takahashi です。このソフトウェアとマニュアルは、AI（Anthropic 社の Claude）を使って作りました（<a href="#ai">16 章</a>）。</p>
+<p>版 <span class="version">1.2.1</span>。作者は Takahashi です。このソフトウェアとマニュアルは、AI（Anthropic 社の Claude）を使って作りました（<a href="#ai">16 章</a>）。</p>
 
 <nav>
 <p>目次。18 の章があります。</p>
@@ -95,7 +95,7 @@ code { font-family: Menlo, monospace; background: #f3f3f3; padding: 0 0.2em; }
 
 <h3>3.1 アプリを置く</h3>
 <ol>
-<li>受け取った zip ファイルを Finder で開きます（選んでコマンド+O）。同じ場所に「Logicサンプルローダー_<span class="version">1.2.0</span>」というフォルダができます</li>
+<li>受け取った zip ファイルを Finder で開きます（選んでコマンド+O）。同じ場所に「Logicサンプルローダー_<span class="version">1.2.1</span>」というフォルダができます</li>
 <li>フォルダの中の「Logicサンプルローダー.app」を、アプリケーションフォルダへ移します。Finder で .app を選んでコマンド+C、アプリケーションフォルダでオプション+コマンド+V（移動）です</li>
 <li>マニュアルなどの文書は、どこに置いてもかまいません</li>
 </ol>
@@ -467,6 +467,7 @@ code { font-family: Menlo, monospace; background: #f3f3f3; padding: 0 0.2em; }
 
 <h2 id="history">18. 更新の記録</h2>
 <ul>
+<li>1.2.1（2026-11-03）: 外付けドライブの隠しファイル（._ で始まるもの）を素材として並べないようにした。読めなかったファイルの数を正しく伝えるようにした</li>
 <li>1.2.0（2026-11-02）: Logic が日本語の表示でも動くようにしました。オーディオトラックに貼ったあと、Logic が素材のテンポ情報やマーカーを読み込むか尋ねたまま次に貼れなくなることがあったのを直しました（「読み込まない」と答えます）。出力のトラック（Stereo Out）を選んでいると、コマンド+右ブラケット・左ブラケットでオーディオトラックへ移れなかったのを直しました。Quick Sampler や Drum Machine Designer の画面が前にあると、オーディオトラックに貼れないことがあったのを直しました。DMD の空のパッドに読み込むとき、「インスペクタが表示されていません」と止まることがあったのを直しました</li>
 <li>1.1.0（2026-10-27）: 画面と読み上げを英語でも出せるようにしました（Mac の言語の設定に合わせます）。英語のマニュアルとはじめにお読みくださいも付けました。コマンド+右ブラケット・左ブラケットでオーディオトラックを移れず、「Logic が応えません」と言うことがあったのを直しました</li>
 <li>1.0.0（2026-10-24）: 初めての配布版</li>

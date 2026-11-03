@@ -42,6 +42,8 @@ def label_control(ctrl, label: str) -> None:
         ctrl.SetName(label)
     except Exception:
         pass
+    if set_ax_label(ctrl, label):
+        return
     if hasattr(ctrl, 'SetHint'):
         try:
             ctrl.SetHint(label)
@@ -51,4 +53,3 @@ def label_control(ctrl, label: str) -> None:
         ctrl.SetToolTip(label)
     except Exception:
         pass
-    set_ax_label(ctrl, label)

@@ -33,22 +33,11 @@ class LabelControlTest(unittest.TestCase):
     def tearDown(self):
         borrowed._ax_label = self.saved
 
-    def _fake(self, labelled: bool):
+    def test_the_borrowed_part_decides(self):
         borrowed._ax_label = SimpleNamespace(
-            set_ax_label=lambda ctrl, label: self.calls.append(("ax", label)) or labelled,
-            label_control=lambda ctrl, label: self.calls.append(("insurance", label)))
-
-    def test_named_control_gets_no_insurance(self):
-        self._fake(True)
-        ctrl = _Ctrl()
-        borrowed.label_control(ctrl, "検索語")
-        self.assertEqual(ctrl.names, ["検索語"])
-        self.assertEqual(self.calls, [("ax", "検索語")])            # 名前は 1 回だけ。保険（ツールチップ）は入れない
-
-    def test_insurance_only_when_the_name_did_not_stick(self):
-        self._fake(False)
+            label_control=lambda ctrl, label: self.calls.append(label))
         borrowed.label_control(_Ctrl(), "検索語")
-        self.assertEqual(self.calls, [("ax", "検索語"), ("insurance", "検索語")])
+        self.assertEqual(self.calls, ["検索語"])
 
     def test_without_the_borrowed_part_only_the_wx_name(self):
         borrowed._ax_label = None

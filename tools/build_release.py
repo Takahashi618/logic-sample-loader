@@ -69,15 +69,32 @@ TOP_APPS = (f"{APP_NAME}.app",)
 PRIVATE_FILE = ROOT / "release_private.json"
 
 
-def _private_lists() -> dict:
+_WORD_LISTS = ("personal", "personal_text", "words")
+
+
+def read_private(path: Path) -> dict:
+    """検索語を読む。ファイルが無ければ空（公開しているソースから組み立てるとき）。
+
+    **壊れているときは止める。** 読めないまま空にすると、検査が全部黙って素通りして
+    「確かめた」と表示される。語は小文字にそろえる（どの検査も大文字小文字を問わない）。
+    """
     try:
-        data = json.loads(PRIVATE_FILE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
         return {}
-    return data if isinstance(data, dict) else {}
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"[エラー] {path.name} を読めません（{exc}）") from exc
+    if not isinstance(data, dict):
+        raise SystemExit(f"[エラー] {path.name} の形が違います")
+    for key in _WORD_LISTS:
+        words = data.get(key)
+        if not (words and isinstance(words, list) and all(w and isinstance(w, str) for w in words)):
+            raise SystemExit(f"[エラー] {path.name} の {key} が語の並びではありません")
+        data[key] = tuple(w.lower() for w in words)
+    return data
 
 
-_PRIVATE = _private_lists()
+_PRIVATE = read_private(PRIVATE_FILE)
 # 配布物に入っていてはいけないもの（作者の名前など）。**大文字小文字を問わず、全部のファイルで探す**
 PERSONAL = tuple(w.encode() for w in _PRIVATE.get("personal", ()))
 # 文字のファイル（自分たちで書いたもの）でだけ探すもの。python 本体や標準ライブラリの中には、
@@ -93,6 +110,12 @@ PRIVATE_SUFFIXES = (".py", ".txt", ".html", ".sh", ".json", ".plist", ".strings"
 BORROWED_EDITS = _PRIVATE.get("borrowed_edits", {})
 
 RESULTS: list[tuple[str, bool, str]] = []
+
+
+def find_words(text: str, words) -> list[str]:
+    """文字列の中にある検索語（大文字小文字を問わない。語は小文字にしてある）。"""
+    lowered = text.lower()
+    return [word for word in words if word in lowered]
 
 
 def clean_part(rel: str, text: str) -> str:
@@ -242,12 +265,20 @@ def compiled_hits() -> list[str]:
 
     from PyInstaller.archive.readers import ZlibArchiveReader
 
-    def strings(code):
-        for c in code.co_consts:
+    def consts(values):
+        # 文字列だけの並びは、コンパイラが 1 つのタプルや frozenset にまとめる
+        for c in values:
             if isinstance(c, str):
                 yield c
+            elif isinstance(c, (tuple, frozenset)):
+                yield from consts(c)
             elif isinstance(c, types.CodeType):
                 yield from strings(c)
+
+    def strings(code):
+        yield from code.co_names
+        yield from code.co_varnames
+        yield from consts(code.co_consts)
 
     words = PRIVATE_WORDS + tuple(w.decode() for w in PERSONAL)
     hits = []
@@ -257,10 +288,13 @@ def compiled_hits() -> list[str]:
             if name.split(".")[0] not in OWN_PACKAGES:
                 continue
             code = reader.extract(name)
-            text = "\n".join(strings(code)).lower() if isinstance(code, types.CodeType) else ""
-            found = [w for w in words if w.lower() in text]
+            found = find_words("\n".join(strings(code)), words) if isinstance(code, types.CodeType) else []
             if found:
                 hits.append(f"{name}（{'・'.join(found)}）")
+    # 入口の app.py は PYZ に入らない（実行ファイルの中の PKG に入る）ので、写しの元を調べる
+    found = find_words(clean_source((ROOT / "app.py").read_text(encoding="utf-8")), words)
+    if found:
+        hits.append(f"app（{'・'.join(found)}）")
     return hits
 
 
@@ -502,14 +536,14 @@ def private_hits(folder: Path) -> list[str]:
     hits = []
     for path in sorted(folder.rglob("*")):
         rel = path.relative_to(folder).as_posix()
-        named = [w for w in PRIVATE_WORDS if w in rel]          # ファイルやフォルダの名前も見る
+        named = find_words(rel, PRIVATE_WORDS)                  # ファイルやフォルダの名前も見る
         if named:
             hits.append(f"{rel}（名前に {'・'.join(named)}）")
             continue
         if path.is_symlink() or not path.is_file() or path.suffix.lower() not in PRIVATE_SUFFIXES:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
-        found = [w for w in PRIVATE_WORDS if w in text]
+        found = find_words(text, PRIVATE_WORDS)
         if found:
             hits.append(f"{path.relative_to(folder)}（{'・'.join(found)}）")
     return hits

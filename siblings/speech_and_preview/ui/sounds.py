@@ -6,6 +6,7 @@ from pathlib import Path
 _SOUND_DIR = Path('/System/Library/Sounds')
 _SOUNDS = {'success': 'Glass.aiff', 'failure': 'Basso.aiff', 'start': 'Tink.aiff'}
 _ENV_SILENT = 'SM_SILENT'
+FAILURE_PREFIXES = ('[エラー]', '[警告]', '[Error]', '[Warning]')
 
 def is_silent() -> bool:
     return os.environ.get(_ENV_SILENT, '') not in ('', '0', 'false', 'False')
@@ -30,6 +31,6 @@ def play(kind: str) -> bool:
         return False
 
 def play_for_message(message: str) -> bool:
-    if message.startswith(('[エラー]', '[警告]')):
+    if message.startswith(FAILURE_PREFIXES):
         return play('failure')
     return play('success')

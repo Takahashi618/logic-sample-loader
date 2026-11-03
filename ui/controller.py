@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from core import fit
-from core.i18n import ERROR, SEP, WARNING, is_english, sentence, sentences, tr
+from core.i18n import ERROR, SEP, WARNING, is_english, plural, sentence, sentences, tr
 from core.settings import (INDEX_PATH, SETTINGS_PATH, LoadSettings, flex_for, follow_for, load_settings,
                            resolve_splice_root, save_settings)
 from core.sibling import FROZEN, load_ptcore
@@ -412,9 +412,9 @@ class AppController:
         self.results = found
         if not found:
             return Outcome(False, tr(f"{form.describe_ja()} に合う素材はありませんでした。",
-                                     f"No samples match {form.describe_ja()}."))
+                                     f"No samples found. Search: {form.describe_ja()}."))
         return Outcome(True, tr(f"{len(found)} 件見つかりました。{form.describe_ja()}。",
-                                f"Found {len(found)}. {form.describe_ja()}."))
+                                f"{plural(len(found), 'sample')} found. Search: {form.describe_ja()}."))
 
     def kind_of(self, entry: Any) -> str:
         """素材の種別。**長さを優先する**（借りている kinds.py）。"""

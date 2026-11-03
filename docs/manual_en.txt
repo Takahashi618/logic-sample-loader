@@ -1,6 +1,6 @@
 ﻿Logic Sample Loader Manual
 
-Version 1.2.0. By Takahashi. This software and this manual were made with AI (Anthropic's Claude) (chapter 16).
+Version 1.2.1. By Takahashi. This software and this manual were made with AI (Anthropic's Claude) (chapter 16).
 The app's file name is Japanese (Logicサンプルローダー.app). When your Mac is set to English, Finder and the app show it as Logic Sample Loader.
 Contents. There are 18 chapters.
 1. What this app does
@@ -66,7 +66,7 @@ This manual uses the Hyphen key of Logic Magician to open plug-in windows. If yo
 
 -- 3.1 Put the app in place
 
-1. Open the zip file in Finder (select it and press Command-O). A folder named “Logicサンプルローダー_1.2.0” appears next to it
+1. Open the zip file in Finder (select it and press Command-O). A folder named “Logicサンプルローダー_1.2.1” appears next to it
 2. Move “Logicサンプルローダー.app” from that folder to the Applications folder: select the app in Finder and press Command-C, then press Option-Command-V (move) in the Applications folder. In English, Finder shows the app as Logic Sample Loader
 3. The manual and other documents can be kept anywhere
 
@@ -410,6 +410,7 @@ Logic Pro, Quick Sampler, Drum Machine Designer and VoiceOver are products of Ap
 
 == 18. Version history
 
+- 1.2.1 (2026-11-03): Hidden files on external drives (names starting with ._) are no longer listed as samples. The number of files that could not be read is now reported correctly. English wording now matches the author's other apps
 - 1.2.0 (2026-11-02): The app now also works when Logic is displayed in Japanese. Fixed a problem where, after pasting on an audio track, Logic kept asking whether to import the sample’s tempo information or markers and the next paste did not work (the app answers Don’t Import). Fixed a problem where Command-Right Bracket and Command-Left Bracket could not move to an audio track while the output track (Stereo Out) was selected. Fixed a problem where pasting on an audio track sometimes failed while a Quick Sampler or Drum Machine Designer window was in front. Fixed a problem where loading into an empty DMD pad sometimes stopped with “The inspector is not shown”
 - 1.1.0 (2026-10-27): The window and spoken messages can now be in English (following the Mac's language settings), with an English manual. Fixed a problem where Command-Right Bracket and Command-Left Bracket sometimes could not move between audio tracks and said “Logic does not respond”
 - 1.0.0 (2026-10-24): First release

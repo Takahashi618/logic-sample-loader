@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import os
 
-__all__ = ["LANG", "ENV_NAME", "detect_language", "preferred_languages", "pick_language", "tr", "is_english"]
+__all__ = ["LANG", "ENV_NAME", "detect_language", "preferred_languages", "pick_language", "tr", "is_english", "plural"]
 
 ENV_NAME = "LOGICLOADER_LANG"
 SUPPORTED = ("ja", "en")
@@ -77,6 +77,12 @@ WARNING = tr("[警告]", "[Warning]")
 # 文の区切り。日本語は「。」で詰める、英語は「. 」で空ける
 PERIOD = tr("。", ".")
 SEP = tr("。", ". ")
+
+
+def plural(count, word: str) -> str:
+    """英語の数え方（"1 sample"・"3 samples"）。日本語の文では使わない。"""
+    shown = f"{count:g}" if isinstance(count, float) else str(count)
+    return f"{shown} {word}" if count == 1 else f"{shown} {word}s"
 
 
 def sentence(text: str) -> str:

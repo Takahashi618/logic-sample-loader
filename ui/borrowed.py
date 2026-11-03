@@ -115,24 +115,14 @@ def make_player():
 
 
 def label_control(ctrl, label: str) -> None:
-    """読み上げ名を付ける。**借りられなければ wx の標準だけで済ませる。**
-
-    **名前（AXDescription）が付いたら、ツールチップ（AXHelp）と入力欄の空欄表示（AXPlaceholderValue）は入れない。**
-    借りた部品の `label_control` は保険として同じ文を 3 か所に入れるが、VoiceOver は名前を読んだあと、少し間をおいて
-    ヒント（AXHelp）として**同じ文をもう一度読む**。タブで移るたびに 2 回ずつ聞こえ、検索結果一覧のまわりでは
-    1 か所で 10 秒を超えた（2026-10-13 に統合ログで実測）。名前が付かなかったときだけ、保険も入れる。
-
-    2026-10-13 からは「入れてから消す」形だった（名前も 2 回付けていた）。2026-10-24 のレビューで、
-    先に名前だけを付け、付かなかったときだけ借りた部品の保険に任せる形にした。
-    """
+    """読み上げ名を付ける。**借りられなければ wx の標準だけで済ませる。**"""
+    if _ax_label is not None:
+        _ax_label.label_control(ctrl, label)
+        return
     try:
         ctrl.SetName(label)
     except Exception:
         pass
-    if _ax_label is None:
-        return
-    if not _ax_label.set_ax_label(ctrl, label):
-        _ax_label.label_control(ctrl, label)
 
 
 def announce(message: str) -> None:

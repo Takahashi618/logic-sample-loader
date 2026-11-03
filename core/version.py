@@ -8,4 +8,4 @@
 - 1.2.0（2026-11-02）: Logic が日本語の表示でも動く（部品の名前を英語と日本語の組で持つ。tools/qs_sample_menu.py）
 """
 
-VERSION = "1.2.0"
+VERSION = "1.2.1"

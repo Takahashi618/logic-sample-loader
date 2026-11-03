@@ -116,6 +116,8 @@ def create_default_backend() -> PlayerBackend:
     except ImportError as exc:
         raise RuntimeError("just_playback が見つかりません。'pip install just_playback' を実行してください。") from exc
     return Playback()
+_WORDS_JA = {'no_file': 'ファイルが読み込まれていません', 'sep': '、', 'stopped': '停止中', 'paused': '一時停止中', 'playing': '再生中', 'position': '{:.1f}秒目', 'no_position': '位置不明', 'length': '全長{:.1f}秒'}
+_WORDS_EN = {'no_file': 'No file is loaded', 'sep': ', ', 'stopped': 'stopped', 'paused': 'paused', 'playing': 'playing', 'position': 'at {:.1f} seconds', 'no_position': 'position unknown', 'length': 'length {:.1f} seconds'}
 
 class PreviewPlayer:
     SEEK_STEP = 1.0
@@ -175,15 +177,23 @@ class PreviewPlayer:
         self._backend.set_volume(volume)
 
     def describe_state_ja(self) -> str:
+        return self._describe_state(_WORDS_JA)
+
+    def describe_state_en(self) -> str:
+        return self._describe_state(_WORDS_EN)
+
+    def _describe_state(self, words: dict[str, str]) -> str:
         if self._current_path is None:
-            return 'ファイルが読み込まれていません'
+            return words['no_file']
         name = Path(self._current_path).name
+        sep = words['sep']
         if not self._backend.active:
-            return f'{name}、停止中'
-        state = '一時停止中' if self._backend.paused else '再生中'
+            return f"{name}{sep}{words['stopped']}"
+        state = words['paused'] if self._backend.paused else words['playing']
         pos = self._backend.curr_pos
         dur = self._backend.duration
-        pos_txt = f'{pos:.1f}秒目' if isinstance(pos, (int, float)) else '位置不明'
+        pos_txt = words['position'].format(pos) if isinstance(pos, (int, float)) else words['no_position']
         if isinstance(dur, (int, float)) and dur > 0:
-            return f'{name}、{state}、{pos_txt}、全長{dur:.1f}秒'
-        return f'{name}、{state}、{pos_txt}'
+            length = words['length'].format(dur)
+            return f'{name}{sep}{state}{sep}{pos_txt}{sep}{length}'
+        return f'{name}{sep}{state}{sep}{pos_txt}'
